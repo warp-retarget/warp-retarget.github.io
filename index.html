@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations.">
+  <meta name="keywords" content="WARP, Retargeting, Humanoid, Whole-Body, Mobile Manipulation, Offline Human Data, SEW, Imitation Learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <!-- MathJax for LaTeX-style math rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[','\\]'], ['$$','$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="#">
+        <span class="icon">
+          <i class="fas fa-home"></i>
+        </span>
+      </a>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#motivation">Why WARP</a>
+      <a class="navbar-item" href="#method">Method</a>
+      <a class="navbar-item" href="#results">Results</a>
+      <a class="navbar-item" href="#BibTeX">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title"><b>WARP</b></h1>
+          <p class="subtitle is-1 publication-subtitle">Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations</p>
+          <div class="venue-highlight-wrap">
+            <div class="venue-highlight" role="status">
+              <div class="venue-highlight__inner">
+                <span class="venue-highlight__icon" aria-hidden="true"><i class="fas fa-award"></i></span>
+                <div class="venue-highlight__copy">
+                  <a class="venue-highlight__venue" href="https://www.corl.org/" target="_blank" rel="noopener">Conference on Robot Learning (CoRL) 2026 &mdash; Under Review</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Anonymous Authors</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank" rel="noopener">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper (coming soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank" rel="noopener">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>ArXiv (coming soon)</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>Citation</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser" id="teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="./static/images_warp/warp_teaser.png" alt="WARP retargets offline human data to various robot embodiments for replay and policy learning." style="width: 100%; height: auto;">
+      <h2 class="subtitle is-4 has-text-centered" style="margin-top: 1rem;">
+        <b>TL;DR:</b> WARP is an analytical, learning-free whole-body retargeter that turns offline human demonstrations into <em>precise</em> and <em>unique</em> robot trajectories &mdash; enabling open-loop replay and zero-shot policy learning for whole-body mobile manipulation, with no robot teleoperation in the loop.
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="abstract">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Mobile whole-body manipulation is a promising application for home robots, but learning such behaviors remains challenging due to the large action space and the high cost of collecting whole-body robot demonstrations. While recent humanoid teleoperation systems enable such data collection, they are expensive, space-intensive, and often unnatural for human operators. Sensorized human data offers the potential for a scalable and diverse source of manipulation data, but transferring behaviors from humans to robots requires overcoming embodiment and action mismatches.
+          </p>
+          <p>
+            To address this, we propose <b>WARP</b> (<b>W</b>hole-body-<b>A</b>ware <b>R</b>etargeting with task <b>P</b>riority), a geometry-based retargeting method that explicitly models the embodiment differences between humans and robots to produce <em>precise</em> and <em>unique</em> solutions. These properties allow WARP to retarget human data fully offline, producing human-like robot actions that serve as accurate, learnable training data and enable policy learning to scale directly from human demonstrations. We validate WARP by replaying retargeted human trajectories on a real robot and by building a framework that learns whole-body mobile manipulation from offline human data alone.
+          </p>
+          <p>
+            To our knowledge, WARP is the first method to demonstrate whole-body mobile manipulation replay and direct policy learning from actions retargeted purely from offline human demonstrations.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="motivation">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <h2 class="title is-3 has-text-centered">Why Offline Whole-Body Retargeting?</h2>
+        <div class="content has-text-justified">
+          <p>
+            Retargeting&mdash;the mapping from human motion to robot motion&mdash;is the central interface between scalable human data and robot policy learning. For whole-body mobile manipulation, prior work either uses <em>online</em> retargeting for teleoperation (which requires hardware, instrumented space, and continuous operator effort) or <em>offline</em> retargeting that reduces each demonstration to an end-effector trajectory (which discards the torso, elbow, and base information humans implicitly optimize).
+          </p>
+          <p>
+            To learn from offline human data, a whole-body retargeter must satisfy two properties that prior work largely overlooks:
+          </p>
+          <ul>
+            <li><b>Precision in whole-body task space.</b> The relevant task space is the full kinematic chain&mdash;shoulder, elbow, wrist, and torso&mdash;not just the end-effector. Replayed open-loop on the robot, the retargeted trajectory must reproduce the human's task execution faithfully across this extended task space.</li>
+            <li><b>Uniqueness of solution.</b> A given human pose must map to a single robot configuration. Because humanoids possess substantial kinematic redundancy, optimization-based IK with different initializations or weightings can produce inconsistent solutions for nearly identical inputs &mdash; corrosive for offline policy learning, where identical observations paired with divergent actions force the policy to model a multimodal target, degrading training stability and downstream success.</li>
+          </ul>
+          <p>
+            Together, precision and uniqueness make the retargeted data both <em>replayable</em> for verification and <em>learnable</em> as a single-mode supervisory signal.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <h3 class="subtitle is-4 has-text-weight-bold">Where existing retargeters break</h3>
+        <p class="has-text-justified">
+          Existing whole-body retargeters (e.g., GMR built on MINK) frame retargeting as Jacobian-based velocity optimization:
+          \[
+            \dot{q}^\ast = \arg\min_{\dot{q}}\; \lVert J\dot{q} - \dot{T}^\ast \rVert^2 + \lambda\, \lVert \dot{q} - \dot{q}_{\text{sec}} \rVert^2.
+          \]
+          This conflates cross-embodiment skeleton matching with joint-angle IK and creates three problems:
+          <b>(1) Non-uniqueness</b> &mdash; iterative descent commits to whichever branch of the null-space is nearest the seed; different seeds yield disjoint configurations.
+          <b>(2) Imprecision</b> &mdash; the weight \(\lambda\) couples end-effector accuracy to pose naturalness; either tracking or whole-body imitation suffers.
+          <b>(3) Calibration sensitivity</b> &mdash; misidentified robot keypoints or non-rescaled human keypoints propagate systematic errors through every timestep.
+        </p>
+        <div style="text-align: center; margin-top: 1rem;">
+          <img src="./static/images_warp/warp_sew_vs_mink.png" alt="SEW vs. MINK retargeting comparison" style="width: 90%; max-width: 100%; height: auto;">
+          <p class="has-text-justified" style="margin-top: 0.5rem;">
+            <b>SEW (ours) vs. MINK.</b> On identical human input, optimization-based MINK trades off end-effector accuracy against pose naturalness and produces inconsistent solutions across initializations; the SEW-based formulation yields a single, exact closed-form solution.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="method">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <h2 class="title is-3 has-text-centered">WARP: Geometric Whole-Body Retargeting</h2>
+        <div class="content has-text-justified">
+          <p>
+            WARP is a full-stack offline retargeting pipeline designed to deliver both precision and uniqueness. At its core is <b>c-SEW</b>, a closed-form geometric solver that casts retargeting in the Shoulder&ndash;Elbow&ndash;Wrist (SEW) representation&mdash;an embodiment-agnostic encoding shared by humans and humanoids&mdash;and augments it with an analytical end-effector constraint. Around c-SEW we add a VLM-driven task-priority switcher, a spring&ndash;damper lower-body controller, and a hierarchy-masked flow policy that consumes the retargeted data.
+          </p>
+          <img src="./static/images_warp/warp_method.png" alt="WARP method overview: cross-embodiment offset, c-SEW solver, task-priority switcher, lazy lower-body control.">
+          <p class="has-text-justified" style="margin-top: 0.5rem;">
+            <b>Figure:</b> WARP pipeline. A cross-embodiment offset aligns the human and robot skeletons; c-SEW recovers a unique, exactly EEF-matched arm configuration in closed form; a task-priority switcher selects the active retargeting target per task phase; a lazy lower-body controller produces smooth mobile-base motion.
+          </p>
+        </div>
+
+        <div class="content has-text-justified">
+          <h3 class="subtitle is-4 has-text-weight-bold">c-SEW: Constrained Skeleton Alignment</h3>
+          <p>
+            The SEW representation identifies shoulder, elbow, and wrist joint groups in humanoid arms whose geometry mirrors human skeleton counterparts. Aligning <em>limb directions</em> via the Subproblem&nbsp;1/2 chain admits at most one solution per spherical-shoulder arm, making the joint configuration <em>provably unique</em>. However, alignment by direction alone is blind to link length, so a steady-state palm error persists whenever robot and human segments differ.
+          </p>
+          <p>
+            <b>c-SEW</b> fixes this by adding two closed-form steps:
+          </p>
+          <ul>
+            <li><b>Adaptive offset.</b> We measure how far the robot palm drifts from the human palm when the robot aligns its links to human arm directions, then shift the robot upper-body origin by the two-arm centroid offset \(t_{\text{offset}}\) so the palm centroids coincide exactly.</li>
+            <li><b>Per-arm palm alignment.</b> Hand orientation transfers directly; the desired robot wrist is recovered analytically from the human palm target; the elbow is placed by Subproblem&nbsp;3 about the human SEW half-plane normal, preserving the human elbow configuration.</li>
+          </ul>
+          <p>
+            The corrected skeleton is then solved by Subproblem&nbsp;1/2 of <em>SEW-Mimic</em> to recover joint angles in closed form. The result is: <b>(i)</b> a unique solution for any non-degenerate arm pose, <b>(ii)</b> exact palm-position matching by construction, <b>(iii)</b> whole-body orientation similarity preserved via the SEW elbow angle \(\psi\), and <b>(iv)</b> microsecond closed-form execution with no per-robot rescaling or calibration.
+          </p>
+        </div>
+
+        <div class="content has-text-justified">
+          <h3 class="subtitle is-4 has-text-weight-bold">Task-Priority Switcher</h3>
+          <p>
+            Unlike end-effector-only pipelines, WARP supports multiple body parts as task-priority targets. We cast task-space selection as classification over a predefined set of body-part classes, with a vision&ndash;language model selecting the active target per task phase. During offline retargeting, we switch goals according to the VLM labels and linearly blend adjacent phases in robot joint space and base SE(2) position, producing smooth transitions across task stages.
+          </p>
+        </div>
+
+        <div class="content has-text-justified">
+          <h3 class="subtitle is-4 has-text-weight-bold">Lazy Lower-Body Control</h3>
+          <p>
+            For mobile manipulation we decouple base motion from upper-body tracking via a spring&ndash;damper controller that produces smooth mobile-base trajectories without disturbing upper-body alignment. The base lazily follows the human's lower-body anchor, stabilizing reaching tasks and providing reach extension only when needed.
+          </p>
+          <div class="columns is-centered">
+            <div class="column is-10">
+              <img src="./static/images_warp/warp_spring_damper.png" alt="Spring-damper lower-body control" style="width: 100%; max-width: 100%; height: auto;">
+              <p class="has-text-centered" style="margin-top: 0.5rem;">
+                <b>Figure:</b> Spring&ndash;damper lower-body controller. The base follows a virtual coupling to the human anchor, decoupling locomotion from upper-body tracking accuracy.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content has-text-justified">
+          <h3 class="subtitle is-4 has-text-weight-bold">Hierarchy-Masked Flow Policy</h3>
+          <p>
+            Whole-body mobile manipulation has a natural causal structure: proximal, high-inertia body parts (base, torso) define the reachable workspace and support, while distal parts (arms, hands) resolve contact-rich interaction. We use this as an inductive bias inside a flow-matching action head. With the action chunk
+            \[
+              \mathbf{a}_{1:H} = [\mathbf{a}^{b}, \mathbf{a}^{\tau}, \mathbf{a}^{r}, \mathbf{a}^{h}]_{1:H}
+            \]
+            for base, torso, arm, and hand, we impose the factorization
+            \[
+              p(\mathbf{a}^{b}\mid \mathbf{o})\,
+              p(\mathbf{a}^{\tau}\mid \mathbf{o},\mathbf{a}^{b})\,
+              p(\mathbf{a}^{r}\mid \mathbf{o},\mathbf{a}^{b},\mathbf{a}^{\tau})\,
+              p(\mathbf{a}^{h}\mid \mathbf{o},\mathbf{a}^{b},\mathbf{a}^{\tau},\mathbf{a}^{r}).
+            \]
+            We instantiate this via a block-causal attention mask under the ordering \(b \preceq \tau \preceq r \preceq h\) inside a single flow-matching update, preserving inference cost while discouraging the model from explaining proximal motion via distal features.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-small" id="results">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Experimental Results</h2>
+
+      <div class="content has-text-justified">
+        <p>We test three hypotheses:</p>
+        <ul>
+          <li><b>H1 (Retargeting quality):</b> WARP produces higher-quality whole-body motion than end-effector-only and generic whole-body retargeting baselines &mdash; tracking accuracy, smoothness, solution consistency, and solving speed.</li>
+          <li><b>H2 (Downstream learnability):</b> The motion properties produced by WARP translate into measurably better policy learning. Identical policies trained on WARP-retargeted data outperform those trained on baseline-retargeted data.</li>
+          <li><b>H3 (Necessity of whole-body retargeting):</b> For tasks whose success depends on null-space configuration (torso, elbow, or base placement), end-effector-only retargeting is fundamentally insufficient regardless of data quantity.</li>
+        </ul>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-12">
+          <h3 class="subtitle is-4 has-text-weight-bold">H1 &mdash; Retargeting Quality</h3>
+          <div class="content has-text-centered">
+            <img src="./static/images_warp/warp_retargeting_diagnostics.png" alt="Retargeting feasibility and motion-quality diagnostics" style="width: 100%; max-width: 100%; height: auto;">
+            <p class="has-text-justified">
+              <b>Retargeting diagnostics.</b> Left to right: hardware feasibility (linear and log scale) and retargeting / motion quality (linear and log scale). WARP matches or surpasses SEW-Mimic on tracking and speed while substantially improving over MINK variants on smoothness and consistency, and over EEF-only baselines on whole-body keypoint tracking. HOMIE and GMR trail on speed by 1&ndash;3 orders of magnitude.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-12">
+          <h3 class="subtitle is-4 has-text-weight-bold">H2 &mdash; Downstream Policy Learning</h3>
+          <div class="content has-text-centered">
+            <img src="./static/images_warp/warp_experiment_laundry.png" alt="Pick-up-laundry task: policy learning from WARP-retargeted human data" style="width: 100%; max-width: 100%; height: auto;">
+            <p class="has-text-justified">
+              <b>Pick up Laundry.</b> An identical HPT-vanilla policy is trained on three versions of the same DexMimicGen trajectories that differ only in the retargeter used (MINK, EEF-only WARP, full WARP). Holding the policy, hyperparameters, and data scale fixed isolates the effect of retargeting quality on learnability.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-12">
+          <h3 class="subtitle is-4 has-text-weight-bold">Cross-Embodiment Retargeting</h3>
+          <div class="content has-text-centered">
+            <img src="./static/images_warp/warp_cross_embodiment.png" alt="Cross-embodiment retargeting across humanoid robots" style="width: 100%; max-width: 100%; height: auto;">
+            <p class="has-text-justified">
+              <b>Cross-embodiment.</b> WARP applies across multiple humanoid embodiments without per-robot rescaling. We report replay and policy success rates on three DexMimicGen tasks (<i>can_sort</i>, <i>pouring</i>, <i>coffee</i>).
+            </p>
+          </div>
+
+          <div class="content has-text-centered" style="margin-top: 1rem;">
+            <table class="table is-bordered is-striped is-hoverable" style="margin: 0 auto;">
+              <thead>
+                <tr>
+                  <th rowspan="2">Method</th>
+                  <th colspan="2"><i>can_sort</i></th>
+                  <th colspan="2"><i>pouring</i></th>
+                  <th colspan="2"><i>coffee</i></th>
+                  <th colspan="2"><b>mean</b></th>
+                </tr>
+                <tr>
+                  <th>replay</th><th>policy</th>
+                  <th>replay</th><th>policy</th>
+                  <th>replay</th><th>policy</th>
+                  <th>replay</th><th>policy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MINK</td>
+                  <td>&mdash;</td><td>94%</td>
+                  <td>&mdash;</td><td>74%</td>
+                  <td>&mdash;</td><td>8%</td>
+                  <td>&mdash;</td><td>59%</td>
+                </tr>
+                <tr style="background-color: #f3e8ff;">
+                  <td><b>WARP (ours)</b></td>
+                  <td>&mdash;</td><td><b>100%</b></td>
+                  <td>&mdash;</td><td><b>78%</b></td>
+                  <td>&mdash;</td><td><b>34%</b></td>
+                  <td>&mdash;</td><td><b>71%</b></td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="has-text-centered" style="margin-top: 0.5rem;">
+              <b>Table:</b> Replay and policy success rates (%) on DexMimicGen tasks by retargeting method.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="limitations">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <h2 class="title is-3 has-text-centered">Limitations and Future Work</h2>
+        <div class="content has-text-justified">
+          <p>
+            <b>Limitation:</b> WARP is a kinematic, quasi-static retargeter; it does not currently model dynamic locomotion or contact-rich loco-manipulation. The task-priority switcher relies on a VLM labeller whose error mode propagates into the priority schedule.
+          </p>
+          <p>
+            <b>Future work:</b> We hope to extend WARP toward dynamic whole-body skills, broader embodiment coverage, and tighter integration between the geometric solver and learned residual controllers&mdash;moving toward scalable mobile manipulation supervised entirely by offline human data.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{warp2026anonymous,
+      title     = {WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations},
+      author    = {Anonymous Authors},
+      booktitle = {Conference on Robot Learning (CoRL)},
+      year      = {2026},
+      note      = {Under review}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <div class="content">
+          <p>
+            Website source format is adapted from the Nerfies project page template.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+## Notes learned while editing
+
+- For website embedding, prefer `.mp4` (H.264 video + AAC audio) over `.mov`. Many browsers/GitHub Pages setups won’t reliably play `.mov` (or `video/quicktime`) inside `<video>`.
+- Hero “accepted at venue” callouts: keep markup in `index.html` and shared styling in `static/css/index.css` (e.g. `.venue-highlight`) so the banner stays consistent with site fonts (Google Sans) and doesn’t rely on inline styles.
+
