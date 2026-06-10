@@ -2,10 +2,10 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations.">
+  <meta name="description" content="WARP: Whole-Body Retargeting for Learning from Offline Human Demonstrations.">
   <meta name="keywords" content="WARP, Retargeting, Humanoid, Whole-Body, Mobile Manipulation, Offline Human Data, SEW, Imitation Learning">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations</title>
+  <title>WARP: Whole-Body Retargeting for Learning from Offline Human Demonstrations</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
 
@@ -22,18 +22,6 @@
   <script src="./static/js/bulma-carousel.min.js"></script>
   <script src="./static/js/bulma-slider.min.js"></script>
   <script src="./static/js/index.js"></script>
-
-  <!-- MathJax for LaTeX-style math rendering -->
-  <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [['\\(','\\)'], ['$', '$']],
-        displayMath: [['\\[','\\]'], ['$$','$$']]
-      },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
@@ -67,7 +55,7 @@
       <div class="columns is-centered">
         <div class="column has-text-centered">
           <h1 class="title publication-title">WARP</h1>
-          <p class="subtitle publication-subtitle">Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations</p>
+          <p class="subtitle publication-subtitle">Whole-Body Retargeting for Learning from Offline Human Demonstrations</p>
 
           <hr class="title-divider" aria-hidden="true">
 
@@ -112,7 +100,7 @@
         </video>
       </div>
       <h2 class="subtitle is-4 has-text-centered video-caption">
-        <b>TL;DR:</b> WARP is an analytical, learning-free whole-body retargeter that turns offline human demonstrations into <em>precise</em> and <em>unique</em> robot trajectories &mdash; enabling open-loop replay and zero-shot policy learning for whole-body mobile manipulation, with no robot teleoperation in the loop.
+        <b>TL;DR:</b> WARP converts offline human demonstrations into <em>precise</em>, <em>consistent</em> whole-body robot actions in closed form &mdash; enabling open-loop replay and policy learning for whole-body mobile manipulation, with no teleoperation in the loop.
       </h2>
     </div>
   </div>
@@ -125,13 +113,13 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Mobile whole-body manipulation is a promising application for home robots, but learning such behaviors remains challenging due to the large action space and the high cost of collecting whole-body robot demonstrations. While recent humanoid teleoperation systems enable such data collection, they are expensive, space-intensive, and often unnatural for human operators. Sensorized human data offers the potential for a scalable and diverse source of manipulation data, but transferring behaviors from humans to robots requires overcoming embodiment and action mismatches.
+            Direct transfer from human demonstration to learnable robot action is a crucial step towards scalable whole-body mobile manipulation. While human data scales better than mobile teleoperation, it requires overcoming significant embodiment gaps: existing retargeting methods yield imprecise or inconsistent solutions, causing action multi-modality that prevents supervised policies from reliably converging.
           </p>
           <p>
-            To address this, we propose <b>WARP</b> (<b>W</b>hole-body-<b>A</b>ware <b>R</b>etargeting with task <b>P</b>riority), a geometry-based retargeting method that explicitly models the embodiment differences between humans and robots to produce <em>precise</em> and <em>unique</em> solutions. These properties allow WARP to retarget human data fully offline, producing human-like robot actions that serve as accurate, learnable training data and enable policy learning to scale directly from human demonstrations. We validate WARP by replaying retargeted human trajectories on a real robot and by building a framework that learns whole-body mobile manipulation from offline human data alone.
+            We present <b>W</b>hole-body-<b>A</b>ware <b>R</b>etargeting from human <b>P</b>ose (<b>WARP</b>), an offline pipeline that explicitly models embodiment differences to extract precise, unique whole-body actions. WARP leverages a closed-form Shoulder&ndash;Elbow&ndash;Wrist (SEW) geometric solver for exact end-effector tracking while preserving whole-body structural intent. Paired with lazy mobile-base control, it extracts accurate, consistent robot trajectories.
           </p>
           <p>
-            To our knowledge, WARP is the first method to demonstrate whole-body mobile manipulation replay and direct policy learning from actions retargeted purely from offline human demonstrations.
+            Evaluations show WARP provides highly reliable data for open-loop real-world replay. To our knowledge, WARP is the first framework to achieve zero-shot whole-body mobile manipulation directly from offline human demonstrations, eliminating the need for human-in-the-loop teleoperation action data.
           </p>
         </div>
       </div>
@@ -146,39 +134,17 @@
         <h2 class="title is-3 has-text-centered">Why Offline Whole-Body Retargeting?</h2>
         <div class="content has-text-justified">
           <p>
-            Retargeting&mdash;the mapping from human motion to robot motion&mdash;is the central interface between scalable human data and robot policy learning. For whole-body mobile manipulation, prior work either uses <em>online</em> retargeting for teleoperation (which requires hardware, instrumented space, and continuous operator effort) or <em>offline</em> retargeting that reduces each demonstration to an end-effector trajectory (which discards the torso, elbow, and base information humans implicitly optimize).
-          </p>
-          <p>
-            To learn from offline human data, a whole-body retargeter must satisfy two properties that prior work largely overlooks:
+            During teleoperation, a human operator closes the loop in real time &mdash; if the robot wrist drifts or picks a bad IK branch, the operator compensates. Offline, there is no such correction: <em>the retargeted trajectory is the supervision</em>. This makes two failure modes of existing retargeters fatal:
           </p>
           <ul>
-            <li><b>Precision in whole-body task space.</b> The relevant task space is the full kinematic chain&mdash;shoulder, elbow, wrist, and torso&mdash;not just the end-effector. Replayed open-loop on the robot, the retargeted trajectory must reproduce the human's task execution faithfully across this extended task space.</li>
-            <li><b>Uniqueness of solution.</b> A given human pose must map to a single robot configuration. Because humanoids possess substantial kinematic redundancy, optimization-based IK with different initializations or weightings can produce inconsistent solutions for nearly identical inputs &mdash; corrosive for offline policy learning, where identical observations paired with divergent actions force the policy to model a multimodal target, degrading training stability and downstream success.</li>
+            <li><b>Imprecision.</b> Weighted objectives trade end-effector accuracy against whole-body similarity; either way, retargeting error becomes supervision error.</li>
+            <li><b>Inconsistency.</b> Humanoids are highly redundant, so nearly identical human poses can map to different robot configurations depending on solver initialization &mdash; pairing similar observations with divergent actions and impeding policy learning.</li>
           </ul>
-          <p>
-            Together, precision and uniqueness make the retargeted data both <em>replayable</em> for verification and <em>learnable</em> as a single-mode supervisory signal.
-          </p>
         </div>
-      </div>
-    </div>
-
-    <div class="columns is-centered">
-      <div class="column is-12">
-        <h3 class="subtitle is-4 has-text-weight-bold">Where existing retargeters break</h3>
-        <p class="has-text-justified">
-          Existing whole-body retargeters (e.g., GMR built on MINK) frame retargeting as Jacobian-based velocity optimization:
-          \[
-            \dot{q}^\ast = \arg\min_{\dot{q}}\; \lVert J\dot{q} - \dot{T}^\ast \rVert^2 + \lambda\, \lVert \dot{q} - \dot{q}_{\text{sec}} \rVert^2.
-          \]
-          This conflates cross-embodiment skeleton matching with joint-angle IK and creates three problems:
-          <b>(1) Non-uniqueness</b> &mdash; iterative descent commits to whichever branch of the null-space is nearest the seed; different seeds yield disjoint configurations.
-          <b>(2) Imprecision</b> &mdash; the weight \(\lambda\) couples end-effector accuracy to pose naturalness; either tracking or whole-body imitation suffers.
-          <b>(3) Calibration sensitivity</b> &mdash; misidentified robot keypoints or non-rescaled human keypoints propagate systematic errors through every timestep.
-        </p>
-        <div style="text-align: center; margin-top: 1rem;">
-          <img src="./static/images_warp/warp_sew_vs_mink.png" alt="SEW vs. MINK retargeting comparison" style="width: 90%; max-width: 100%; height: auto;">
+        <div style="text-align: center; margin-top: 0.5rem;">
+          <img src="./static/images_warp/warp_sim_illustration.png" alt="WARP is precise, consistent, and smooth compared to baselines" style="width: 100%; height: auto;">
           <p class="has-text-justified" style="margin-top: 0.5rem;">
-            <b>SEW (ours) vs. MINK.</b> On identical human input, optimization-based MINK trades off end-effector accuracy against pose naturalness and produces inconsistent solutions across initializations; the SEW-based formulation yields a single, exact closed-form solution.
+            <b>WARP is precise, consistent, and smooth.</b> <b>(a)</b> WARP matches both the end-effector constraint and the human body pose; baselines satisfy only one. <b>(b)</b> Under perturbed initial guesses, optimization-based MINK is inconsistent, while WARP's closed-form solution is identical every time. <b>(c)</b> A responsive upper body compensates for the low-frequency lazy base, smoothing the base trajectory.
           </p>
         </div>
       </div>
@@ -190,71 +156,29 @@
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-12">
-        <h2 class="title is-3 has-text-centered">WARP: Geometric Whole-Body Retargeting</h2>
+        <h2 class="title is-3 has-text-centered">Method</h2>
         <div class="content has-text-justified">
           <p>
-            WARP is a full-stack offline retargeting pipeline designed to deliver both precision and uniqueness. At its core is <b>c-SEW</b>, a closed-form geometric solver that casts retargeting in the Shoulder&ndash;Elbow&ndash;Wrist (SEW) representation&mdash;an embodiment-agnostic encoding shared by humans and humanoids&mdash;and augments it with an analytical end-effector constraint. Around c-SEW we add a VLM-driven task-priority switcher, a spring&ndash;damper lower-body controller, and a hierarchy-masked flow policy that consumes the retargeted data.
+            WARP is a geometry-based retargeter paired with a policy trained on its output. Its core, <b>c-SEW</b>, solves retargeting in closed form over the Shoulder&ndash;Elbow&ndash;Wrist (SEW) representation: instead of optimizing in redundant joint space, it constructs a target robot skeleton with the palm matched as a <em>hard constraint</em>, then recovers joint angles analytically &mdash; no iterative solver at any stage.
           </p>
-          <img src="./static/images_warp/warp_method.png" alt="WARP method overview: cross-embodiment offset, c-SEW solver, task-priority switcher, lazy lower-body control.">
+          <img src="./static/images_warp/warp_method_v2.png" alt="WARP method: adaptive offset, palm alignment, elbow nullspace resolution, solved SEW skeleton.">
           <p class="has-text-justified" style="margin-top: 0.5rem;">
-            <b>Figure:</b> WARP pipeline. A cross-embodiment offset aligns the human and robot skeletons; c-SEW recovers a unique, exactly EEF-matched arm configuration in closed form; a task-priority switcher selects the active retargeting target per task phase; a lazy lower-body controller produces smooth mobile-base motion.
+            <b>Offline retargeting with WARP.</b> <b>(a)</b> Adaptive offset finds the optimal robot torso placement. <b>(b)</b> Aligning the robot palm to the human palm determines the robot wrist. <b>(c)</b> Exact palm alignment leaves the elbow underconstrained. <b>(d)</b> The elbow nullspace is resolved by transferring the human elbow angle, yielding the solved robot SEW skeleton.
           </p>
         </div>
 
         <div class="content has-text-justified">
-          <h3 class="subtitle is-4 has-text-weight-bold">c-SEW: Constrained Skeleton Alignment</h3>
-          <p>
-            The SEW representation identifies shoulder, elbow, and wrist joint groups in humanoid arms whose geometry mirrors human skeleton counterparts. Aligning <em>limb directions</em> via the Subproblem&nbsp;1/2 chain admits at most one solution per spherical-shoulder arm, making the joint configuration <em>provably unique</em>. However, alignment by direction alone is blind to link length, so a steady-state palm error persists whenever robot and human segments differ.
-          </p>
-          <p>
-            <b>c-SEW</b> fixes this by adding two closed-form steps:
-          </p>
           <ul>
-            <li><b>Adaptive offset.</b> We measure how far the robot palm drifts from the human palm when the robot aligns its links to human arm directions, then shift the robot upper-body origin by the two-arm centroid offset \(t_{\text{offset}}\) so the palm centroids coincide exactly.</li>
-            <li><b>Per-arm palm alignment.</b> Hand orientation transfers directly; the desired robot wrist is recovered analytically from the human palm target; the elbow is placed by Subproblem&nbsp;3 about the human SEW half-plane normal, preserving the human elbow configuration.</li>
+            <li><b>Adaptive offset.</b> Shift the robot upper-body origin so the two-arm palm centroids coincide with the human's, absorbing link-length differences in closed form.</li>
+            <li><b>Per-arm palm alignment.</b> Hand orientation transfers directly; the robot wrist follows analytically from the palm target; the elbow is placed on the human's SEW half-plane, with at most one valid configuration per arm.</li>
+            <li><b>Lazy mobile-base tracking.</b> The 6-DoF torso absorbs small upper-body adjustments while the base moves only for genuine relocation &mdash; stable manipulation and smooth base motion at once.</li>
+            <li><b>Hierarchy-masked flow policy.</b> A single flow-matching head with block-causal attention over base &#8828; torso &#8828; arm &#8828; hand, so proximal motion is never explained by distal features, at unchanged inference cost.</li>
           </ul>
           <p>
-            The corrected skeleton is then solved by Subproblem&nbsp;1/2 of <em>SEW-Mimic</em> to recover joint angles in closed form. The result is: <b>(i)</b> a unique solution for any non-degenerate arm pose, <b>(ii)</b> exact palm-position matching by construction, <b>(iii)</b> whole-body orientation similarity preserved via the SEW elbow angle \(\psi\), and <b>(iv)</b> microsecond closed-form execution with no per-robot rescaling or calibration.
+            The result is a <em>unique</em> solution for any non-degenerate pose, <em>exact</em> palm matching by construction, preserved whole-body similarity, and microsecond solve times with no per-robot rescaling or calibration.
           </p>
-        </div>
-
-        <div class="content has-text-justified">
-          <h3 class="subtitle is-4 has-text-weight-bold">Task-Priority Switcher</h3>
           <p>
-            Unlike end-effector-only pipelines, WARP supports multiple body parts as task-priority targets. We cast task-space selection as classification over a predefined set of body-part classes, with a vision&ndash;language model selecting the active target per task phase. During offline retargeting, we switch goals according to the VLM labels and linearly blend adjacent phases in robot joint space and base SE(2) position, producing smooth transitions across task stages.
-          </p>
-        </div>
-
-        <div class="content has-text-justified">
-          <h3 class="subtitle is-4 has-text-weight-bold">Lazy Lower-Body Control</h3>
-          <p>
-            For mobile manipulation we decouple base motion from upper-body tracking via a spring&ndash;damper controller that produces smooth mobile-base trajectories without disturbing upper-body alignment. The base lazily follows the human's lower-body anchor, stabilizing reaching tasks and providing reach extension only when needed.
-          </p>
-          <div class="columns is-centered">
-            <div class="column is-10">
-              <img src="./static/images_warp/warp_spring_damper.png" alt="Spring-damper lower-body control" style="width: 100%; max-width: 100%; height: auto;">
-              <p class="has-text-centered" style="margin-top: 0.5rem;">
-                <b>Figure:</b> Spring&ndash;damper lower-body controller. The base follows a virtual coupling to the human anchor, decoupling locomotion from upper-body tracking accuracy.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="content has-text-justified">
-          <h3 class="subtitle is-4 has-text-weight-bold">Hierarchy-Masked Flow Policy</h3>
-          <p>
-            Whole-body mobile manipulation has a natural causal structure: proximal, high-inertia body parts (base, torso) define the reachable workspace and support, while distal parts (arms, hands) resolve contact-rich interaction. We use this as an inductive bias inside a flow-matching action head. With the action chunk
-            \[
-              \mathbf{a}_{1:H} = [\mathbf{a}^{b}, \mathbf{a}^{\tau}, \mathbf{a}^{r}, \mathbf{a}^{h}]_{1:H}
-            \]
-            for base, torso, arm, and hand, we impose the factorization
-            \[
-              p(\mathbf{a}^{b}\mid \mathbf{o})\,
-              p(\mathbf{a}^{\tau}\mid \mathbf{o},\mathbf{a}^{b})\,
-              p(\mathbf{a}^{r}\mid \mathbf{o},\mathbf{a}^{b},\mathbf{a}^{\tau})\,
-              p(\mathbf{a}^{h}\mid \mathbf{o},\mathbf{a}^{b},\mathbf{a}^{\tau},\mathbf{a}^{r}).
-            \]
-            We instantiate this via a block-causal attention mask under the ordering \(b \preceq \tau \preceq r \preceq h\) inside a single flow-matching update, preserving inference cost while discouraging the model from explaining proximal motion via distal features.
+            <b>Data &amp; platform.</b> Demonstrations are collected with a single Meta Quest headset &mdash; whole-body motion with full hand articulation at 60&nbsp;Hz, no mocap rig or robot in the loop. We deploy the RB-Y1 humanoid (holonomic base, 6-DoF torso, two 7-DoF arms, 12-DoF five-fingered XHands) under joint-impedance control at 100&nbsp;Hz.
           </p>
         </div>
       </div>
@@ -265,246 +189,214 @@
 <section class="hero is-small" id="results">
   <div class="hero-body">
     <div class="container is-max-desktop">
-      <h2 class="title is-3 has-text-centered">Experimental Results</h2>
+      <h2 class="title is-3 has-text-centered">Results</h2>
 
       <div class="content has-text-justified">
-        <p>We test three hypotheses:</p>
-        <ul>
-          <li><b>H1 (Retargeting quality):</b> WARP produces higher-quality whole-body motion than end-effector-only and generic whole-body retargeting baselines &mdash; tracking accuracy, smoothness, solution consistency, and solving speed.</li>
-          <li><b>H2 (Downstream learnability):</b> The motion properties produced by WARP translate into measurably better policy learning. Identical policies trained on WARP-retargeted data outperform those trained on baseline-retargeted data.</li>
-          <li><b>H3 (Necessity of whole-body retargeting):</b> For tasks whose success depends on null-space configuration (torso, elbow, or base placement), end-effector-only retargeting is fundamentally insufficient regardless of data quantity.</li>
-        </ul>
+        <p>We test three hypotheses: <b>H1</b> &mdash; WARP produces higher-quality whole-body motion than end-effector-only and generic retargeting baselines; <b>H2</b> &mdash; these motion properties translate into measurably better policy learning; <b>H3</b> &mdash; for tasks that depend on torso, elbow, or base placement, end-effector-only retargeting is fundamentally insufficient.</p>
       </div>
 
       <div class="columns is-centered">
         <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">H1 &mdash; Retargeting Quality</h3>
+          <h3 class="subtitle is-4 has-text-weight-bold">Retargeting Quality (H1)</h3>
           <div class="content">
+            <p class="has-text-justified">
+              On 514 manipulation demonstrations from BONES-SEED-SOMA, we compare WARP against optimization-based <b>MINK-EF</b> (end-effector only), <b>MINK-TE</b> (+ torso and elbow constraints), and unconstrained <b>SEW-M</b> (SEW-Mimic), with joint limits (JL) off and on.
+            </p>
             <div class="table-container">
-              <table class="table is-bordered is-narrow results-metrics-table">
+              <table class="table results-metrics-table tbl-h1">
                 <thead>
                   <tr>
                     <th rowspan="2">Method</th>
                     <th rowspan="2">JL</th>
-                    <th colspan="4">Palm tracking &darr;</th>
-                    <th colspan="3">Arm / torso tracking &darr;</th>
-                    <th colspan="2">Joint-limit / feasibility</th>
-                  </tr>
-                  <tr>
-                    <th>Raw<br><span class="unit">mm</span></th>
-                    <th>Clean<br><span class="unit">mm</span></th>
-                    <th>P95<br><span class="unit">mm</span></th>
-                    <th>P99<br><span class="unit">mm</span></th>
-                    <th>Elbow<br><span class="unit">deg</span></th>
-                    <th>Torso<br><span class="unit">deg</span></th>
-                    <th>Out@15<br><span class="unit">frac.</span></th>
-                    <th>Limit<br><span class="unit">frac.</span></th>
-                    <th>Margin &uarr;<br><span class="unit">deg</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>SEW-M</td><td>off</td>
-                    <td>178.979</td><td>&mdash;</td><td>201.056</td><td>203.800</td>
-                    <td><u>2.669</u></td><td><b>1.189e-6</b></td><td><b>0.000</b></td>
-                    <td>0.0126</td><td>7.108</td>
-                  </tr>
-                  <tr>
-                    <td>MINK-EF</td><td>off</td>
-                    <td><u>0.701</u></td><td>0.609</td><td><u>1.853</u></td><td><u>3.389</u></td>
-                    <td>79.110</td><td>20.680</td><td>0.6247</td>
-                    <td>0.1610</td><td>&minus;54.95</td>
-                  </tr>
-                  <tr>
-                    <td>MINK-TE</td><td>off</td>
-                    <td>18.557</td><td>1.360</td><td>73.980</td><td>115.400</td>
-                    <td>8.966</td><td>3.857</td><td><u>0.0266</u></td>
-                    <td>0.0852</td><td>&minus;70.11</td>
-                  </tr>
-                  <tr class="warp-row">
-                    <td><b>WARP</b></td><td>off</td>
-                    <td><b>0.0046</b></td><td><b>0.0005</b></td><td><b>0.0465</b></td><td><b>0.0621</b></td>
-                    <td><b>0.0105</b></td><td><u>1.220e-6</u></td><td><b>0.000</b></td>
-                    <td><b>0.0047</b></td><td><b>13.02</b></td>
-                  </tr>
-                  <tr class="jl-sep">
-                    <td>SEW-M</td><td>on</td>
-                    <td>215.641</td><td>&mdash;</td><td>272.842</td><td>285.700</td>
-                    <td>5.775</td><td>5.329</td><td>0.1624</td>
-                    <td>0.0131</td><td>4.804</td>
-                  </tr>
-                  <tr>
-                    <td>MINK-EF</td><td>on</td>
-                    <td>0.751</td><td>0.520</td><td>2.478</td><td>4.298</td>
-                    <td>39.250</td><td>19.430</td><td>0.6113</td>
-                    <td>0.1247</td><td>&minus;1.000</td>
-                  </tr>
-                  <tr>
-                    <td>MINK-TE</td><td>on</td>
-                    <td>19.492</td><td>1.352</td><td>69.345</td><td>105.300</td>
-                    <td>6.881</td><td>5.128</td><td>0.0491</td>
-                    <td>0.0420</td><td>1.648</td>
-                  </tr>
-                  <tr class="warp-row">
-                    <td><b>WARP</b></td><td>on</td>
-                    <td>24.048</td><td><u>0.154</u></td><td>82.036</td><td>100.600</td>
-                    <td>3.344</td><td>4.451</td><td>0.1298</td>
-                    <td><u>0.0060</u></td><td><u>9.559</u></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="table-container" style="margin-top: 1.25rem;">
-              <table class="table is-bordered is-narrow results-metrics-table">
-                <thead>
-                  <tr>
-                    <th rowspan="2">Method</th>
-                    <th rowspan="2">JL</th>
-                    <th>Collision &darr;</th>
-                    <th colspan="3">Normalized motion deviation &darr;</th>
+                    <th colspan="3">Tracking error &darr;</th>
+                    <th colspan="3">Feasibility &darr;</th>
                     <th colspan="3">Solver variation &darr;</th>
-                    <th>Solve time &darr;</th>
                   </tr>
                   <tr>
+                    <th>Palm<br><span class="unit">mm</span></th>
+                    <th>P95<br><span class="unit">mm</span></th>
+                    <th>Ori.<br><span class="unit">deg</span></th>
+                    <th>Torso<br><span class="unit">frac.</span></th>
+                    <th>Limit<br><span class="unit">frac.</span></th>
                     <th>Coll.<br><span class="unit">frac.</span></th>
-                    <th>R-arm<br><span class="unit">&mdash;</span></th>
-                    <th>L-arm<br><span class="unit">&mdash;</span></th>
-                    <th>Torso<br><span class="unit">&mdash;</span></th>
-                    <th>RMS<br><span class="unit">deg</span></th>
-                    <th>Pair-L2<br><span class="unit">&mdash;</span></th>
+                    <th>NNAD<br><span class="unit">&mdash;</span></th>
                     <th>PCA<br><span class="unit">eig.</span></th>
-                    <th>Solve<br><span class="unit">ms</span></th>
+                    <th>RMS<br><span class="unit">deg</span></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>SEW-M</td><td>off</td>
-                    <td>0.243</td>
-                    <td><u>0.6578</u></td><td><u>0.6713</u></td><td>0.4879</td>
-                    <td>6.828e-14</td><td><b>0</b></td><td>1.198e-25</td>
-                    <td>14.83</td>
+                    <td>178.979</td><td>201.056</td><td><b>7.89e-6</b></td>
+                    <td><b>0.000</b></td><td>0.0126</td><td>0.243</td>
+                    <td>0.488</td><td>1.20e-25</td><td>6.83e-14</td>
                   </tr>
                   <tr>
                     <td>MINK-EF</td><td>off</td>
-                    <td>0.977</td>
-                    <td>0.6951</td><td>0.7052</td><td>0.3677</td>
-                    <td>3.117</td><td>19.43</td><td>173.5</td>
-                    <td>192.1</td>
+                    <td><u>0.701</u></td><td><u>1.853</u></td><td>0.0107</td>
+                    <td>0.625</td><td>0.1610</td><td>0.977</td>
+                    <td>0.368</td><td>173.49</td><td>3.117</td>
                   </tr>
                   <tr>
                     <td>MINK-TE</td><td>off</td>
-                    <td>0.640</td>
-                    <td>1.603</td><td>1.776</td><td>1.026</td>
-                    <td>6.106</td><td>34.33</td><td>1119.0</td>
-                    <td>235.8</td>
+                    <td>18.557</td><td>73.980</td><td>0.157</td>
+                    <td><u>0.027</u></td><td>0.0852</td><td>0.640</td>
+                    <td>1.026</td><td>1119.11</td><td>6.106</td>
                   </tr>
                   <tr class="warp-row">
                     <td><b>WARP</b></td><td>off</td>
-                    <td>0.163</td>
-                    <td>0.6825</td><td>0.7103</td><td><u>0.2888</u></td>
-                    <td>6.657e-14</td><td><b>0</b></td><td>1.140e-25</td>
-                    <td>6.781</td>
+                    <td><b>0.0046</b></td><td><b>0.046</b></td><td><u>8.74e-6</u></td>
+                    <td><b>0.000</b></td><td><b>0.0047</b></td><td>0.163</td>
+                    <td><u>0.289</u></td><td>1.14e-25</td><td>6.66e-14</td>
                   </tr>
                   <tr class="jl-sep">
                     <td>SEW-M</td><td>on</td>
-                    <td><u>0.084</u></td>
-                    <td><b>0.6527</b></td><td><b>0.6567</b></td><td>0.4419</td>
-                    <td><u>6.561e-14</u></td><td><b>0</b></td><td><u>1.089e-25</u></td>
-                    <td><b>4.978</b></td>
+                    <td>215.641</td><td>272.842</td><td>6.304</td>
+                    <td>0.162</td><td>0.0131</td><td><u>0.084</u></td>
+                    <td>0.442</td><td><u>1.09e-25</u></td><td><u>6.56e-14</u></td>
                   </tr>
                   <tr>
                     <td>MINK-EF</td><td>on</td>
-                    <td>0.222</td>
-                    <td>0.7233</td><td>0.7321</td><td>0.3543</td>
-                    <td>3.169</td><td>19.61</td><td>227.3</td>
-                    <td>192.5</td>
+                    <td>0.751</td><td>2.478</td><td>0.0112</td>
+                    <td>0.611</td><td>0.1247</td><td>0.222</td>
+                    <td>0.354</td><td>227.29</td><td>3.169</td>
                   </tr>
                   <tr>
                     <td>MINK-TE</td><td>on</td>
-                    <td>0.478</td>
-                    <td>0.9570</td><td>0.9569</td><td>0.4539</td>
-                    <td>4.964</td><td>28.38</td><td>613.5</td>
-                    <td>234.4</td>
+                    <td>19.492</td><td>69.345</td><td>0.188</td>
+                    <td>0.049</td><td>0.0420</td><td>0.478</td>
+                    <td>0.454</td><td>613.47</td><td>4.964</td>
                   </tr>
                   <tr class="warp-row">
                     <td><b>WARP</b></td><td>on</td>
-                    <td><b>0.017</b></td>
-                    <td>0.7270</td><td>0.7434</td><td><b>0.2659</b></td>
-                    <td><b>6.456e-14</b></td><td><b>0</b></td><td><b>1.062e-25</b></td>
-                    <td><u>5.430</u></td>
+                    <td>24.048</td><td>82.036</td><td>3.259</td>
+                    <td>0.130</td><td><u>0.0060</u></td><td><b>0.017</b></td>
+                    <td><b>0.266</b></td><td><b>1.06e-25</b></td><td><b>6.46e-14</b></td>
                   </tr>
                 </tbody>
               </table>
             </div>
-
             <p class="has-text-justified" style="margin-top: 0.85rem;">
-              <b>Quantitative simulation retargeting results.</b> Split into two parts for readability: tracking &amp; joint-limit feasibility (top), then collision, normalized motion deviation, solver variation &amp; solve time (bottom). Lower is better for every metric except <b>Margin</b> (higher is better). <b>Bold</b> = best and <u>underline</u> = second-best across all eight rows; <b>JL</b> = joint-limit handling on/off; <span style="background-color:#f3e8ff; padding:0 0.25em; border-radius:3px;">WARP rows</span> are highlighted.
+              <b>Simulation retargeting results.</b> All metrics lower-is-better; <b>bold</b> = best, <u>underline</u> = second-best. WARP reduces palm error by over <b>150&times;</b> versus MINK-EF with machine-precision hand orientation, produces the fewest joint-limit and self-collision violations, is orders of magnitude more consistent, and solves roughly <b>30&times;</b> faster &mdash; converting the SEED dataset in about an hour on one CPU versus a full day.
             </p>
+
+            <div class="task-video-bar">
+              <span class="task-video-label">Qualitative comparison &mdash; pick a task:</span>
+              <div class="select is-rounded">
+                <select id="h1-task-select" aria-label="Select a task to compare retargeters">
+                  <option value="crouch_cupboard_mid_in" selected>Crouch cupboard (mid, in)</option>
+                  <option value="crouch_cupboard_mid_out">Crouch cupboard (mid, out)</option>
+                  <option value="crouch_operating_cupboard_low_in">Crouch operating cupboard (low, in)</option>
+                  <option value="crouch_operating_cupboard_mid_in">Crouch operating cupboard (mid, in)</option>
+                  <option value="crouch_operating_cupboard_mid_out">Crouch operating cupboard (mid, out)</option>
+                  <option value="cutting_bread">Cutting bread</option>
+                  <option value="cutting_masterchiefstyle">Cutting (master-chef style)</option>
+                  <option value="frying_pan">Frying pan</option>
+                  <option value="grating_vegetables">Grating vegetables</option>
+                  <option value="heavy_item_cupboard_high_in">Heavy item cupboard (high, in)</option>
+                  <option value="heavy_item_cupboard_high_out">Heavy item cupboard (high, out)</option>
+                  <option value="looting_cupboard_high">Looting cupboard (high)</option>
+                  <option value="making_friedeggs">Making fried eggs</option>
+                  <option value="operating_blender">Operating blender</option>
+                  <option value="operating_fridge_high_in">Operating fridge (high, in)</option>
+                  <option value="operating_fridge_low_in">Operating fridge (low, in)</option>
+                  <option value="operating_microwave">Operating microwave</option>
+                  <option value="peeling_vegetables">Peeling vegetables</option>
+                  <option value="pounding_meat">Pounding meat</option>
+                  <option value="street_avoid_car_270_walk">Street: avoid car (270, walk)</option>
+                  <option value="street_avoid_obstacle_180_walk">Street: avoid obstacle (180, walk)</option>
+                  <option value="washing_dishes">Washing dishes</option>
+                </select>
+              </div>
+            </div>
+            <div class="video-block video-block--panel">
+              <video id="h1-task-video" autoplay muted loop playsinline preload="auto">
+                <source src="./static/videos/h1/crouch_cupboard_mid_in.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p class="has-text-centered task-video-caption">
+              Retargeting the same human clip with each method. Left to right: <b>Human</b> input, <b>WARP (ours)</b>, SEW-M, MINK-EF, MINK-TE.
+            </p>
+            <script>
+              (function () {
+                var sel = document.getElementById('h1-task-select');
+                var vid = document.getElementById('h1-task-video');
+                var src = vid.querySelector('source');
+                sel.addEventListener('change', function () {
+                  src.src = './static/videos/h1/' + sel.value + '.mp4';
+                  vid.load();
+                  vid.muted = true;
+                  var p = vid.play();
+                  if (p && p.catch) p.catch(function () {});
+                });
+              })();
+            </script>
           </div>
         </div>
       </div>
 
       <div class="columns is-centered">
         <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">H2 &mdash; Downstream Policy Learning</h3>
+          <h3 class="subtitle is-4 has-text-weight-bold">Simulation: Downstream Policy Learning (H2)</h3>
           <div class="content has-text-centered">
-            <img src="./static/images_warp/warp_experiment_laundry.png" alt="Pick-up-laundry task: policy learning from WARP-retargeted human data" style="width: 100%; max-width: 100%; height: auto;">
+            <img src="./static/images_warp/warp_cross_embodiment.png" alt="WARP retargets one robot motion to different robot embodiments" style="width: 100%; max-width: 100%; height: auto;">
             <p class="has-text-justified">
-              <b>Pick up Laundry.</b> An identical HPT-vanilla policy is trained on three versions of the same DexMimicGen trajectories that differ only in the retargeter used (MINK, EEF-only WARP, full WARP). Holding the policy, hyperparameters, and data scale fixed isolates the effect of retargeting quality on learnability.
+              We retarget 200 DexMimicGen demonstrations per task (GR1 &rarr; RB-Y1 with dexterous hands) using WARP and MINK, then train an identical policy on each. Replay rates are comparable &mdash; but policies trained on WARP data succeed <b>12% more on average</b>, with the largest gap on fine-grained manipulation (<i>coffee</i>). Retargeting nuances invisible at replay become decisive downstream. WARP also transfers the same motion across robot embodiments (above).
             </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="columns is-centered">
-        <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">Cross-Embodiment Retargeting</h3>
-          <div class="content has-text-centered">
-            <img src="./static/images_warp/warp_cross_embodiment.png" alt="Cross-embodiment retargeting across humanoid robots" style="width: 100%; max-width: 100%; height: auto;">
-            <p class="has-text-justified">
-              <b>Cross-embodiment.</b> WARP applies across multiple humanoid embodiments without per-robot rescaling. We report replay and policy success rates on three DexMimicGen tasks (<i>can_sort</i>, <i>pouring</i>, <i>coffee</i>).
-            </p>
-          </div>
-
-          <div class="content has-text-centered" style="margin-top: 1rem;">
             <div class="table-container">
-            <table class="table is-bordered is-striped is-hoverable" style="margin: 0 auto;">
-              <thead>
-                <tr>
-                  <th rowspan="2">Method</th>
-                  <th colspan="2"><i>can_sort</i></th>
-                  <th colspan="2"><i>pouring</i></th>
-                  <th colspan="2"><i>coffee</i></th>
-                  <th colspan="2"><b>mean</b></th>
-                </tr>
-                <tr>
-                  <th>replay</th><th>policy</th>
-                  <th>replay</th><th>policy</th>
-                  <th>replay</th><th>policy</th>
-                  <th>replay</th><th>policy</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>MINK</td>
-                  <td>&mdash;</td><td>94%</td>
-                  <td>&mdash;</td><td>74%</td>
-                  <td>&mdash;</td><td>8%</td>
-                  <td>&mdash;</td><td>59%</td>
-                </tr>
-                <tr style="background-color: #f3e8ff;">
-                  <td><b>WARP (ours)</b></td>
-                  <td>&mdash;</td><td><b>100%</b></td>
-                  <td>&mdash;</td><td><b>78%</b></td>
-                  <td>&mdash;</td><td><b>34%</b></td>
-                  <td>&mdash;</td><td><b>71%</b></td>
-                </tr>
-              </tbody>
-            </table>
+              <table class="table results-metrics-table tbl-dex">
+                <thead>
+                  <tr>
+                    <th rowspan="2">Method</th>
+                    <th colspan="2"><i>can_sort</i></th>
+                    <th colspan="2"><i>pouring</i></th>
+                    <th colspan="2"><i>coffee</i></th>
+                    <th colspan="2"><b>average</b></th>
+                  </tr>
+                  <tr>
+                    <th>replay</th><th>policy</th>
+                    <th>replay</th><th>policy</th>
+                    <th>replay</th><th>policy</th>
+                    <th>replay</th><th>policy</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>MINK</td>
+                    <td><b>99.5%</b></td><td>94%</td>
+                    <td>88.5%</td><td>74%</td>
+                    <td>50.5%</td><td>8%</td>
+                    <td>79.5%</td><td>59%</td>
+                  </tr>
+                  <tr class="warp-row">
+                    <td><b>WARP</b></td>
+                    <td>98.5%</td><td><b>100%</b></td>
+                    <td><b>90.5%</b></td><td><b>78%</b></td>
+                    <td><b>51.0%</b></td><td><b>34%</b></td>
+                    <td><b>80.0%</b></td><td><b>71%</b></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <p class="has-text-centered" style="margin-top: 0.5rem;">
-              <b>Table:</b> Replay and policy success rates (%) on DexMimicGen tasks by retargeting method.
+              Replay and policy rollout success (%) on DexMimicGen tasks.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered">
+        <div class="column is-12">
+          <h3 class="subtitle is-4 has-text-weight-bold">Real-World Evaluation (H2, H3)</h3>
+          <div class="content has-text-centered">
+            <img src="./static/images_warp/warp_task_flow.png" alt="Human demonstrations and robot executions across four real-world tasks" style="width: 100%; max-width: 100%; height: auto;">
+            <p class="has-text-justified">
+              We collect 50 human demonstrations per task across four real-world tasks: <b>pick-up-laundry</b> (bimanual wrist precision), <b>push-cart</b> (base&ndash;arm coordination under contact), <b>rotate-box</b> (torso&ndash;arm coordination), and <b>fridge-door-closing</b> &mdash; pushing the door shut with the <em>elbow</em>, a contact no end-effector-only formulation can even express.
+            </p>
+            <img src="./static/images_warp/warp_hardware_results.png" alt="Real-world replay and policy rollout results, 10 trials each" style="width: 75%; max-width: 100%; height: auto; margin-top: 0.5rem;">
+            <p class="has-text-justified">
+              WARP outperforms MINK across all four tasks (10 trials each). It keeps palm contact and recoverable posture where MINK drives the torso into extreme or colliding configurations, replays the elbow-contact fridge task in <b>90%</b> of trials, and trains stronger policies even at comparable replay rates (<b>65% vs. 40%</b> on rotate-box) &mdash; motion quality, not replay completion, governs downstream success.
             </p>
           </div>
         </div>
@@ -517,13 +409,10 @@
   <div class="container is-max-desktop">
     <div class="columns is-centered">
       <div class="column is-12">
-        <h2 class="title is-3 has-text-centered">Limitations and Future Work</h2>
+        <h2 class="title is-3 has-text-centered">Limitations</h2>
         <div class="content has-text-justified">
           <p>
-            <b>Limitation:</b> WARP is a kinematic, quasi-static retargeter; it does not currently model dynamic locomotion or contact-rich loco-manipulation. The task-priority switcher relies on a VLM labeller whose error mode propagates into the priority schedule.
-          </p>
-          <p>
-            <b>Future work:</b> We hope to extend WARP toward dynamic whole-body skills, broader embodiment coverage, and tighter integration between the geometric solver and learned residual controllers&mdash;moving toward scalable mobile manipulation supervised entirely by offline human data.
+            Our current policy training lacks image observations, which limits the range of tasks we can attempt. We plan to investigate visual-motor policy learning next, and how WARP-retargeted offline human data can support it.
           </p>
         </div>
       </div>
@@ -536,7 +425,7 @@
   <div class="container is-max-desktop content">
     <h2 class="title">BibTeX</h2>
     <pre><code>@inproceedings{warp2026anonymous,
-      title     = {WARP: Geometric Whole-Body Retargeting Enables Policy Learning from Offline Human Demonstrations},
+      title     = {WARP: Whole-Body Retargeting for Learning from Offline Human Demonstrations},
       author    = {Anonymous Authors},
       booktitle = {Conference on Robot Learning (CoRL)},
       year      = {2026},

@@ -47,6 +47,36 @@ body {
   margin-top: 1.25rem;
 }
 
+/* 5-panel comparison clips (H1): low wide strip, same width as the results table,
+   keep the video's native 5:1 proportion, never letterbox */
+.video-block--panel video {
+  aspect-ratio: 1920 / 384;
+  height: auto;
+  background: transparent;
+  border-radius: 8px;
+}
+
+.task-video-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  margin: 1.6rem 0 0.9rem;
+  font-family: 'Google Sans', sans-serif;
+}
+
+.task-video-label {
+  font-weight: 600;
+  color: #363636;
+}
+
+.task-video-caption {
+  margin-top: 0.6rem;
+  font-size: 0.92rem;
+  color: #555;
+}
+
 
 .publication-title {
 }
@@ -226,7 +256,6 @@ body {
     font-style: italic;
     color: #6b7280;
 }
-
 @media screen and (max-width: 480px) {
     .publication-title { letter-spacing: 0.03em; }
     .anon-note { padding: 0 1rem; }
@@ -239,32 +268,86 @@ mjx-container[display="true"] {
     overflow-y: hidden;
 }
 
-/* ---- Dense quantitative results tables (H1 retargeting metrics) ---- */
+/* ---- Results tables: LaTeX booktabs look ---- */
 .results-metrics-table {
     margin: 0 auto;
-    font-size: 0.8rem;
+    font-size: 0.84rem;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
 }
-.results-metrics-table th,
-.results-metrics-table td {
+
+/* doubled class beats Bulma's .content table td/th rules */
+.results-metrics-table.results-metrics-table td,
+.results-metrics-table.results-metrics-table th,
+.results-metrics-table.results-metrics-table thead th {
+    border: none;
     text-align: center;
     vertical-align: middle;
+    padding: 0.42em 0.85em;
 }
+
 .results-metrics-table td {
     white-space: nowrap;
 }
+
 .results-metrics-table th:first-child,
 .results-metrics-table td:first-child {
     text-align: left;
     white-space: nowrap;
 }
+
+.results-metrics-table thead th {
+    color: #1a1a1a;
+}
+
+/* booktabs rules: \toprule, \cmidrule, \midrule, \bottomrule */
+.results-metrics-table.results-metrics-table thead tr:first-child th {
+    border-top: 2px solid #141414;
+}
+.results-metrics-table.results-metrics-table thead th[colspan] {
+    border-bottom: 1px solid #9a9a9a;
+}
+.results-metrics-table.results-metrics-table thead tr:last-child th,
+.results-metrics-table.results-metrics-table thead th[rowspan] {
+    border-bottom: 1.5px solid #141414;
+}
+.results-metrics-table.results-metrics-table tbody tr:last-child td {
+    border-bottom: 2px solid #141414;
+}
+.results-metrics-table.results-metrics-table .jl-sep td {
+    border-top: 1px solid #141414;
+}
+
+/* light vertical separators between metric groups (the | in the LaTeX colspec) */
+.tbl-h1 tbody td:nth-child(3),
+.tbl-h1 tbody td:nth-child(6),
+.tbl-h1 tbody td:nth-child(9),
+.tbl-h1 thead tr:first-child th:nth-child(3),
+.tbl-h1 thead tr:first-child th:nth-child(4),
+.tbl-h1 thead tr:first-child th:nth-child(5),
+.tbl-h1 thead tr:last-child th:nth-child(1),
+.tbl-h1 thead tr:last-child th:nth-child(4),
+.tbl-h1 thead tr:last-child th:nth-child(7),
+.tbl-dex tbody td:nth-child(2),
+.tbl-dex tbody td:nth-child(4),
+.tbl-dex tbody td:nth-child(6),
+.tbl-dex tbody td:nth-child(8),
+.tbl-dex thead tr:first-child th:nth-child(2),
+.tbl-dex thead tr:first-child th:nth-child(3),
+.tbl-dex thead tr:first-child th:nth-child(4),
+.tbl-dex thead tr:first-child th:nth-child(5),
+.tbl-dex thead tr:last-child th:nth-child(1),
+.tbl-dex thead tr:last-child th:nth-child(3),
+.tbl-dex thead tr:last-child th:nth-child(5),
+.tbl-dex thead tr:last-child th:nth-child(7) {
+    border-left: 1px solid #dcdcdc;
+}
+
 .results-metrics-table .unit {
     font-weight: 400;
-    color: #999;
-    font-size: 0.82em;
+    color: #8a8a8a;
+    font-size: 0.8em;
 }
 .results-metrics-table .warp-row {
     background-color: #f3e8ff;
-}
-.results-metrics-table .jl-sep td {
-    border-top: 2px solid #7a7a7a;
 }
