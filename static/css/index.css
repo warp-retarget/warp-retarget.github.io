@@ -28,6 +28,26 @@ body {
 }
 
 
+/* ---- Reusable video block (teaser + supplementary clips) ---- */
+.video-block {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.video-block video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+}
+
+.video-caption {
+  margin-top: 1.25rem;
+}
+
+
 .publication-title {
 }
 
@@ -49,6 +69,22 @@ body {
 
 .publication-title {
     font-family: 'Google Sans', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.05;
+    margin-bottom: 0.35rem;
+    color: #1b2a4a;
+}
+
+/* Gradient divider under the title block — a brand-colored section rule (like a markdown ---) */
+.title-divider {
+    width: min(88%, 30rem);
+    height: 3px;
+    margin: 1.4rem auto 1.1rem;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f5821f 0%, #fb9b3a 45%, #4a90d9 100%);
 }
 
 .title-with-logo {
@@ -66,10 +102,12 @@ body {
 
 .publication-subtitle {
     font-family: 'Google Sans', sans-serif;
+    font-size: clamp(1.25rem, 3.2vw, 1.9rem);
     font-weight: 600;
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-    color: #363636;
+    line-height: 1.3;
+    max-width: 46rem;
+    margin: 0 auto;
+    color: #374151;
 }
 
 .publication-authors {
@@ -181,81 +219,52 @@ body {
     clip-path: inset(1px 1px);
 }
 
-/* Hero venue acceptance (RSS) — below full title, light ribbon on white */
-.venue-highlight-wrap {
-    display: flex;
-    justify-content: center;
-    margin-top: 1.35rem;
-    margin-bottom: 1rem;
-    padding: 0 0.75rem;
-}
-
-.venue-highlight {
-    width: 100%;
-    max-width: 38rem;
-    margin: 0;
-    font-family: 'Google Sans', sans-serif;
-    border-radius: 14px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8f7f4 100%);
-    border: 1px solid rgba(30, 41, 59, 0.1);
-    box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.04),
-        0 8px 28px rgba(15, 23, 42, 0.08);
-}
-
-.venue-highlight__inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem 1.25rem;
-    padding: 0.95rem 1.35rem 1rem;
-}
-
-.venue-highlight__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 2.75rem;
-    height: 2.75rem;
-    font-size: 1.2rem;
-    color: #3d2f0a;
-    background: linear-gradient(145deg, #f3e7c8 0%, #e4c76a 45%, #c9a227 100%);
-    border-radius: 12px;
-    box-shadow:
-        0 2px 6px rgba(166, 124, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
-.venue-highlight__copy {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-width: 0;
-}
-
-.venue-highlight__venue {
-    display: inline-block;
-    font-size: clamp(1.05rem, 3vw, 1.35rem);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.25;
-    color: #1e293b;
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.venue-highlight__venue:hover {
-    color: #0f172a;
-    border-bottom-color: rgba(201, 162, 39, 0.65);
+/* ---- Hero anonymous-review note ---- */
+.anon-note {
+    margin-top: 0;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #6b7280;
 }
 
 @media screen and (max-width: 480px) {
-    .venue-highlight__inner {
-        flex-direction: column;
-        padding: 1rem 1.1rem 1.05rem;
-    }
+    .publication-title { letter-spacing: 0.03em; }
+    .anon-note { padding: 0 1rem; }
+}
+
+/* Long display equations scroll inside their own box instead of widening the page (mobile) */
+mjx-container[display="true"] {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* ---- Dense quantitative results tables (H1 retargeting metrics) ---- */
+.results-metrics-table {
+    margin: 0 auto;
+    font-size: 0.8rem;
+}
+.results-metrics-table th,
+.results-metrics-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+.results-metrics-table td {
+    white-space: nowrap;
+}
+.results-metrics-table th:first-child,
+.results-metrics-table td:first-child {
+    text-align: left;
+    white-space: nowrap;
+}
+.results-metrics-table .unit {
+    font-weight: 400;
+    color: #999;
+    font-size: 0.82em;
+}
+.results-metrics-table .warp-row {
+    background-color: #f3e8ff;
+}
+.results-metrics-table .jl-sep td {
+    border-top: 2px solid #7a7a7a;
 }

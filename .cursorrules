@@ -1,5 +1,7 @@
 ## Notes learned while editing
 
 - For website embedding, prefer `.mp4` (H.264 video + AAC audio) over `.mov`. Many browsers/GitHub Pages setups won’t reliably play `.mov` (or `video/quicktime`) inside `<video>`.
-- Hero “accepted at venue” callouts: keep markup in `index.html` and shared styling in `static/css/index.css` (e.g. `.venue-highlight`) so the banner stays consistent with site fonts (Google Sans) and doesn’t rely on inline styles.
+- Hero header: `.publication-title` (WARP wordmark) sits directly above `.publication-subtitle` as one unit, then a gradient `.title-divider` (an `<hr>`, brand orange→blue, like a markdown `---`), then a single italic `.anon-note` ("Anonymous project page for review"). No venue/status pills — "anonymous project page" already implies anonymized/under-review, so don't restate it. Keep markup in `index.html` and styling in `static/css/index.css` (Google Sans), not inline.
+- Wide content (results tables, BibTeX) must live in a horizontally-scrollable box, or it widens the whole page on mobile and *everything* looks clipped. Wrap tables in Bulma's `.table-container`; `<pre>` already scrolls via Bulma. Verify mobile faithfully with Chrome over CDP using `Emulation.setDeviceMetricsOverride({mobile:true})` — the plain `--screenshot --window-size` path does not emulate the viewport meta and falsely shows clipping.
+- Videos use the reusable `.video-block` wrapper in `index.css`; give each a poster frame pulled from the clip (`static/videos/*_poster.jpg`) and `preload="metadata"` so the large file isn't auto-downloaded on page load.
 
