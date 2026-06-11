@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <!-- Computer Modern (LaTeX) font, used for the results tables -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/font/Serif/cmun-serif.css">
   <link rel="stylesheet" href="./static/css/index.css">
   <link rel="icon" href="./static/images/favicon.svg">
 
@@ -109,18 +111,21 @@
 <section class="section" id="abstract">
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
+      <div class="column is-12">
         <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p>
-            Direct transfer from human demonstration to learnable robot action is a crucial step towards scalable whole-body mobile manipulation. While human data scales better than mobile teleoperation, it requires overcoming significant embodiment gaps: existing retargeting methods yield imprecise or inconsistent solutions, causing action multi-modality that prevents supervised policies from reliably converging.
-          </p>
-          <p>
-            We present <b>W</b>hole-body-<b>A</b>ware <b>R</b>etargeting from human <b>P</b>ose (<b>WARP</b>), an offline pipeline that explicitly models embodiment differences to extract precise, unique whole-body actions. WARP leverages a closed-form Shoulder&ndash;Elbow&ndash;Wrist (SEW) geometric solver for exact end-effector tracking while preserving whole-body structural intent. Paired with lazy mobile-base control, it extracts accurate, consistent robot trajectories.
-          </p>
-          <p>
-            Evaluations show WARP provides highly reliable data for open-loop real-world replay. To our knowledge, WARP is the first framework to achieve zero-shot whole-body mobile manipulation directly from offline human demonstrations, eliminating the need for human-in-the-loop teleoperation action data.
-          </p>
+        <div class="card-rail cols-3">
+          <div class="info-card">
+            <span class="kicker">Problem</span>
+            Human data scales far better than mobile teleoperation, but transferring it to robots must bridge a large embodiment gap. Existing retargeters yield <b>imprecise or inconsistent</b> solutions &mdash; action multi-modality that keeps supervised policies from converging.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Approach</span>
+            <b>WARP</b> (<b>W</b>hole-body-<b>A</b>ware <b>R</b>etargeting from human <b>P</b>ose) extracts <b>precise, unique</b> whole-body actions offline: a closed-form Shoulder&ndash;Elbow&ndash;Wrist solver tracks the end-effector exactly while preserving whole-body intent, paired with lazy mobile-base control.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Why it matters</span>
+            WARP data is reliable enough for <b>open-loop real-world replay</b>. To our knowledge, it is the first framework to achieve <b>zero-shot whole-body mobile manipulation</b> from offline human demonstrations &mdash; no teleoperation in the loop.
+          </div>
         </div>
       </div>
     </div>
@@ -132,19 +137,23 @@
     <div class="columns is-centered">
       <div class="column is-12">
         <h2 class="title is-3 has-text-centered">Why Offline Whole-Body Retargeting?</h2>
-        <div class="content has-text-justified">
-          <p>
-            During teleoperation, a human operator closes the loop in real time &mdash; if the robot wrist drifts or picks a bad IK branch, the operator compensates. Offline, there is no such correction: <em>the retargeted trajectory is the supervision</em>. This makes two failure modes of existing retargeters fatal:
-          </p>
-          <ul>
-            <li><b>Imprecision.</b> Weighted objectives trade end-effector accuracy against whole-body similarity; either way, retargeting error becomes supervision error.</li>
-            <li><b>Inconsistency.</b> Humanoids are highly redundant, so nearly identical human poses can map to different robot configurations depending on solver initialization &mdash; pairing similar observations with divergent actions and impeding policy learning.</li>
-          </ul>
+        <p class="has-text-centered" style="margin-bottom: 1rem;">
+          In teleoperation, an operator absorbs errors in real time. Offline there is no correction &mdash; <em>the retargeted trajectory is the supervision</em>. Two failure modes become fatal:
+        </p>
+        <div class="card-rail cols-2">
+          <div class="info-card">
+            <span class="kicker">Failure mode 1 &middot; Imprecision</span>
+            Weighted IK objectives trade end-effector accuracy against whole-body similarity. Either way, retargeting error becomes <b>supervision error</b>.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Failure mode 2 &middot; Inconsistency</span>
+            Redundant humanoids map nearly identical human poses to <b>different robot configurations</b> across solver seeds &mdash; similar observations, divergent actions.
+          </div>
         </div>
-        <div style="text-align: center; margin-top: 0.5rem;">
+        <div class="has-text-centered" style="margin-top: 0.75rem;">
           <img src="./static/images_warp/warp_sim_illustration.png" alt="WARP is precise, consistent, and smooth compared to baselines" style="width: 100%; height: auto;">
-          <p class="has-text-justified" style="margin-top: 0.5rem;">
-            <b>WARP is precise, consistent, and smooth.</b> <b>(a)</b> WARP matches both the end-effector constraint and the human body pose; baselines satisfy only one. <b>(b)</b> Under perturbed initial guesses, optimization-based MINK is inconsistent, while WARP's closed-form solution is identical every time. <b>(c)</b> A responsive upper body compensates for the low-frequency lazy base, smoothing the base trajectory.
+          <p class="fig-caption">
+            <b>(a)</b> WARP matches the end-effector <em>and</em> the human pose &mdash; baselines satisfy only one. <b>(b)</b> MINK varies across initializations; WARP's closed-form solution never does. <b>(c)</b> The lazy base stays smooth.
           </p>
         </div>
       </div>
@@ -157,30 +166,36 @@
     <div class="columns is-centered">
       <div class="column is-12">
         <h2 class="title is-3 has-text-centered">Method</h2>
-        <div class="content has-text-justified">
-          <p>
-            WARP is a geometry-based retargeter paired with a policy trained on its output. Its core, <b>c-SEW</b>, solves retargeting in closed form over the Shoulder&ndash;Elbow&ndash;Wrist (SEW) representation: instead of optimizing in redundant joint space, it constructs a target robot skeleton with the palm matched as a <em>hard constraint</em>, then recovers joint angles analytically &mdash; no iterative solver at any stage.
-          </p>
+        <p class="has-text-centered" style="margin-bottom: 1rem;">
+          WARP's core, <b>c-SEW</b>, solves retargeting <b>in closed form</b> over the Shoulder&ndash;Elbow&ndash;Wrist representation: the palm is matched exactly as a hard constraint, the remaining freedom preserves the human pose, and joint angles follow analytically &mdash; <em>unique, exact, microseconds per frame, no calibration</em>.
+        </p>
+        <div class="has-text-centered">
           <img src="./static/images_warp/warp_method_v2.png" alt="WARP method: adaptive offset, palm alignment, elbow nullspace resolution, solved SEW skeleton.">
-          <p class="has-text-justified" style="margin-top: 0.5rem;">
-            <b>Offline retargeting with WARP.</b> <b>(a)</b> Adaptive offset finds the optimal robot torso placement. <b>(b)</b> Aligning the robot palm to the human palm determines the robot wrist. <b>(c)</b> Exact palm alignment leaves the elbow underconstrained. <b>(d)</b> The elbow nullspace is resolved by transferring the human elbow angle, yielding the solved robot SEW skeleton.
+          <p class="fig-caption">
+            <b>(a)</b> Adaptive offset places the robot torso &rarr; <b>(b)</b> palm alignment fixes the wrist &rarr; <b>(c)</b> the elbow nullspace is identified &rarr; <b>(d)</b> the human elbow angle resolves it.
           </p>
         </div>
-
-        <div class="content has-text-justified">
-          <ul>
-            <li><b>Adaptive offset.</b> Shift the robot upper-body origin so the two-arm palm centroids coincide with the human's, absorbing link-length differences in closed form.</li>
-            <li><b>Per-arm palm alignment.</b> Hand orientation transfers directly; the robot wrist follows analytically from the palm target; the elbow is placed on the human's SEW half-plane, with at most one valid configuration per arm.</li>
-            <li><b>Lazy mobile-base tracking.</b> The 6-DoF torso absorbs small upper-body adjustments while the base moves only for genuine relocation &mdash; stable manipulation and smooth base motion at once.</li>
-            <li><b>Hierarchy-masked flow policy.</b> A single flow-matching head with block-causal attention over base &#8828; torso &#8828; arm &#8828; hand, so proximal motion is never explained by distal features, at unchanged inference cost.</li>
-          </ul>
-          <p>
-            The result is a <em>unique</em> solution for any non-degenerate pose, <em>exact</em> palm matching by construction, preserved whole-body similarity, and microsecond solve times with no per-robot rescaling or calibration.
-          </p>
-          <p>
-            <b>Data &amp; platform.</b> Demonstrations are collected with a single Meta Quest headset &mdash; whole-body motion with full hand articulation at 60&nbsp;Hz, no mocap rig or robot in the loop. We deploy the RB-Y1 humanoid (holonomic base, 6-DoF torso, two 7-DoF arms, 12-DoF five-fingered XHands) under joint-impedance control at 100&nbsp;Hz.
-          </p>
+        <div class="card-rail cols-4" style="margin-top: 1rem;">
+          <div class="info-card">
+            <span class="kicker">Adaptive offset</span>
+            Shift the robot upper-body origin so palm centroids coincide with the human's &mdash; link-length differences absorbed in closed form.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Palm alignment</span>
+            Hand orientation transfers directly, the wrist follows analytically, and the elbow lands on the human's SEW half-plane &mdash; at most one valid configuration.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Lazy mobile base</span>
+            The 6-DoF torso absorbs small adjustments; the base moves only for genuine relocation &mdash; stable manipulation, smooth base motion.
+          </div>
+          <div class="info-card">
+            <span class="kicker">Hierarchical policy</span>
+            One flow-matching head, block-causal attention over base &#8828; torso &#8828; arm &#8828; hand &mdash; same inference cost.
+          </div>
         </div>
+        <p class="has-text-centered fig-caption">
+          <b>Data:</b> a single Meta Quest &mdash; whole body + hands at 60&nbsp;Hz, no mocap rig or robot in the loop. &nbsp;<b>Robot:</b> RB-Y1 (holonomic base, 6-DoF torso, two 7-DoF arms, XHands) at 100&nbsp;Hz.
+        </p>
       </div>
     </div>
   </div>
@@ -191,16 +206,12 @@
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Results</h2>
 
-      <div class="content has-text-justified">
-        <p>We test three hypotheses: <b>H1</b> &mdash; WARP produces higher-quality whole-body motion than end-effector-only and generic retargeting baselines; <b>H2</b> &mdash; these motion properties translate into measurably better policy learning; <b>H3</b> &mdash; for tasks that depend on torso, elbow, or base placement, end-effector-only retargeting is fundamentally insufficient.</p>
-      </div>
-
       <div class="columns is-centered">
         <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">Retargeting Quality (H1)</h3>
+          <h3 class="subtitle is-4 has-text-weight-bold">Retargeting Quality</h3>
           <div class="content">
-            <p class="has-text-justified">
-              On 514 manipulation demonstrations from BONES-SEED-SOMA, we compare WARP against optimization-based <b>MINK-EF</b> (end-effector only), <b>MINK-TE</b> (+ torso and elbow constraints), and unconstrained <b>SEW-M</b> (SEW-Mimic), with joint limits (JL) off and on.
+            <p class="has-text-centered fig-caption" style="margin-bottom: 0.75rem;">
+              514 BONES-SEED-SOMA manipulation clips &middot; baselines: MINK-EF (EEF-only), MINK-TE (+torso/elbow), SEW-M &middot; lower is better, <b>bold</b> = best, <u>underline</u> = second.
             </p>
             <div class="table-container">
               <table class="table results-metrics-table tbl-h1">
@@ -277,7 +288,7 @@
               </table>
             </div>
             <p class="has-text-justified" style="margin-top: 0.85rem;">
-              <b>Simulation retargeting results.</b> All metrics lower-is-better; <b>bold</b> = best, <u>underline</u> = second-best. WARP reduces palm error by over <b>150&times;</b> versus MINK-EF with machine-precision hand orientation, produces the fewest joint-limit and self-collision violations, is orders of magnitude more consistent, and solves roughly <b>30&times;</b> faster &mdash; converting the SEED dataset in about an hour on one CPU versus a full day.
+              WARP cuts palm error <b>&gt;150&times;</b> vs MINK-EF at machine-precision orientation, violates joint limits and self-collides the least, is orders of magnitude more consistent, and solves <b>~30&times;</b> faster (an hour vs a day for SEED).
             </p>
 
             <div class="task-video-bar">
@@ -338,11 +349,11 @@
 
       <div class="columns is-centered">
         <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">Simulation: Downstream Policy Learning (H2)</h3>
+          <h3 class="subtitle is-4 has-text-weight-bold">Policy Learning in Simulation</h3>
           <div class="content has-text-centered">
             <img src="./static/images_warp/warp_cross_embodiment.png" alt="WARP retargets one robot motion to different robot embodiments" style="width: 100%; max-width: 100%; height: auto;">
             <p class="has-text-justified">
-              We retarget 200 DexMimicGen demonstrations per task (GR1 &rarr; RB-Y1 with dexterous hands) using WARP and MINK, then train an identical policy on each. Replay rates are comparable &mdash; but policies trained on WARP data succeed <b>12% more on average</b>, with the largest gap on fine-grained manipulation (<i>coffee</i>). Retargeting nuances invisible at replay become decisive downstream. WARP also transfers the same motion across robot embodiments (above).
+              200 DexMimicGen demos per task, retargeted GR1 &rarr; RB-Y1 with WARP and MINK; identical policy per retargeter. Replay is comparable &mdash; but policies trained on WARP data succeed <b>+12% on average</b>. Nuances invisible at replay become decisive downstream.
             </p>
             <div class="table-container">
               <table class="table results-metrics-table tbl-dex">
@@ -379,7 +390,7 @@
                 </tbody>
               </table>
             </div>
-            <p class="has-text-centered" style="margin-top: 0.5rem;">
+            <p class="has-text-centered fig-caption">
               Replay and policy rollout success (%) on DexMimicGen tasks.
             </p>
           </div>
@@ -388,15 +399,15 @@
 
       <div class="columns is-centered">
         <div class="column is-12">
-          <h3 class="subtitle is-4 has-text-weight-bold">Real-World Evaluation (H2, H3)</h3>
+          <h3 class="subtitle is-4 has-text-weight-bold">Real-World Evaluation</h3>
           <div class="content has-text-centered">
             <img src="./static/images_warp/warp_task_flow.png" alt="Human demonstrations and robot executions across four real-world tasks" style="width: 100%; max-width: 100%; height: auto;">
-            <p class="has-text-justified">
-              We collect 50 human demonstrations per task across four real-world tasks: <b>pick-up-laundry</b> (bimanual wrist precision), <b>push-cart</b> (base&ndash;arm coordination under contact), <b>rotate-box</b> (torso&ndash;arm coordination), and <b>fridge-door-closing</b> &mdash; pushing the door shut with the <em>elbow</em>, a contact no end-effector-only formulation can even express.
+            <p class="fig-caption">
+              50 human demos per task: <b>laundry</b> (bimanual wrists), <b>cart</b> (base&ndash;arm contact), <b>box</b> (torso&ndash;arm twist), <b>fridge</b> &mdash; closed with the <em>elbow</em>, which EEF-only methods cannot even express.
             </p>
-            <img src="./static/images_warp/warp_hardware_results.png" alt="Real-world replay and policy rollout results, 10 trials each" style="width: 75%; max-width: 100%; height: auto; margin-top: 0.5rem;">
+            <img src="./static/images_warp/warp_hardware_results.png" alt="Real-world replay and policy rollout results, 10 trials each" style="width: 75%; max-width: 100%; height: auto; margin-top: 0.75rem;">
             <p class="has-text-justified">
-              WARP outperforms MINK across all four tasks (10 trials each). It keeps palm contact and recoverable posture where MINK drives the torso into extreme or colliding configurations, replays the elbow-contact fridge task in <b>90%</b> of trials, and trains stronger policies even at comparable replay rates (<b>65% vs. 40%</b> on rotate-box) &mdash; motion quality, not replay completion, governs downstream success.
+              WARP wins on all four tasks: <b>90%</b> replay on the elbow-contact fridge task, and stronger policies even at equal replay rates (<b>65% vs 40%</b> on rotate-box) &mdash; motion quality, not replay completion, governs downstream success.
             </p>
           </div>
         </div>

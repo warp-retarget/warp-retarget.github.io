@@ -77,6 +77,135 @@ body {
   color: #555;
 }
 
+/* ---- Sliding info cards: one card per page, swipe or use arrows/dots ---- */
+.card-pager {
+  position: relative;
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+.card-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.3rem 2px 0.3rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.card-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.info-card {
+  scroll-snap-align: start;
+  background: #fff;
+  border: 1px solid rgba(27, 42, 74, 0.10);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 18px rgba(15, 23, 42, 0.05);
+  padding: 1.3rem 1.5rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #374151;
+  text-align: left;
+}
+
+.info-card .kicker {
+  display: block;
+  font-family: 'Google Sans', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f5821f;
+  margin-bottom: 0.45rem;
+}
+
+.info-card b {
+  color: #1b2a4a;
+}
+
+/* prev / next arrows */
+.pager-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.4rem;
+  height: 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  color: #1b2a4a;
+  background: #fff;
+  border: 1px solid rgba(27, 42, 74, 0.18);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  z-index: 2;
+}
+
+.pager-arrow:hover {
+  background: #1b2a4a;
+  color: #fff;
+}
+
+.pager-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
+.pager-prev { left: -3.1rem; }
+.pager-next { right: -3.1rem; }
+
+/* dots */
+.pager-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.pager-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #d1d5db;
+  cursor: pointer;
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+.pager-dot.is-active {
+  width: 22px;
+  background: #1b2a4a;
+}
+
+@media screen and (max-width: 1120px) {
+  .pager-prev { left: 0.35rem; }
+  .pager-next { right: 0.35rem; }
+  .pager-arrow { opacity: 0.85; }
+}
+
+/* touch widths: swipe + dots only, arrows would overlap the card text */
+@media screen and (max-width: 768px) {
+  .pager-arrow { display: none; }
+}
+
+/* one-line figure captions */
+.fig-caption {
+  margin-top: 0.5rem;
+  font-size: 0.92rem;
+  color: #555;
+}
+
 
 .publication-title {
 }
@@ -268,12 +397,13 @@ mjx-container[display="true"] {
     overflow-y: hidden;
 }
 
-/* ---- Results tables: LaTeX booktabs look ---- */
+/* ---- Results tables: LaTeX booktabs look (Computer Modern, print-black) ---- */
 .results-metrics-table {
     margin: 0 auto;
-    font-size: 0.84rem;
+    font-family: 'Computer Modern Serif', 'Latin Modern Roman', Georgia, serif;
+    font-size: 1rem;
+    color: #111;
     border-collapse: collapse;
-    font-variant-numeric: tabular-nums;
 }
 
 /* doubled class beats Bulma's .content table td/th rules */
@@ -283,7 +413,8 @@ mjx-container[display="true"] {
     border: none;
     text-align: center;
     vertical-align: middle;
-    padding: 0.42em 0.85em;
+    padding: 0.3em 0.7em;
+    color: #111;
 }
 
 .results-metrics-table td {
@@ -296,26 +427,29 @@ mjx-container[display="true"] {
     white-space: nowrap;
 }
 
-.results-metrics-table thead th {
-    color: #1a1a1a;
-}
-
-/* booktabs rules: \toprule, \cmidrule, \midrule, \bottomrule */
+/* booktabs rules: \toprule, \cmidrule(lr), \midrule, \bottomrule */
 .results-metrics-table.results-metrics-table thead tr:first-child th {
-    border-top: 2px solid #141414;
+    border-top: 1.6px solid #000;
+    padding-top: 0.45em;
 }
+/* trimmed cmidrule: an inset hairline instead of a full-width border */
 .results-metrics-table.results-metrics-table thead th[colspan] {
-    border-bottom: 1px solid #9a9a9a;
+    background: linear-gradient(#555, #555) bottom center / calc(100% - 1.5em) 1px no-repeat;
+    padding-bottom: 0.4em;
 }
 .results-metrics-table.results-metrics-table thead tr:last-child th,
 .results-metrics-table.results-metrics-table thead th[rowspan] {
-    border-bottom: 1.5px solid #141414;
+    border-bottom: 1px solid #000;
+}
+.results-metrics-table.results-metrics-table tbody tr:first-child td {
+    padding-top: 0.42em;
 }
 .results-metrics-table.results-metrics-table tbody tr:last-child td {
-    border-bottom: 2px solid #141414;
+    border-bottom: 1.6px solid #000;
+    padding-bottom: 0.45em;
 }
 .results-metrics-table.results-metrics-table .jl-sep td {
-    border-top: 1px solid #141414;
+    border-top: 0.8px solid #000;
 }
 
 /* light vertical separators between metric groups (the | in the LaTeX colspec) */
@@ -340,13 +474,13 @@ mjx-container[display="true"] {
 .tbl-dex thead tr:last-child th:nth-child(3),
 .tbl-dex thead tr:last-child th:nth-child(5),
 .tbl-dex thead tr:last-child th:nth-child(7) {
-    border-left: 1px solid #dcdcdc;
+    border-left: 1px solid #cfcfcf;
 }
 
 .results-metrics-table .unit {
     font-weight: 400;
-    color: #8a8a8a;
-    font-size: 0.8em;
+    color: #555;
+    font-size: 0.82em;
 }
 .results-metrics-table .warp-row {
     background-color: #f3e8ff;

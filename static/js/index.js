@@ -82,20 +82,67 @@ $(document).ready(function() {
     	});
     }
 
-    /*var player = document.getElementById('interpolation-video');
-    player.addEventListener('loadedmetadata', function() {
-      $('#interpolation-slider').on('input', function(event) {
-        console.log(this.value, player.duration);
-        player.currentTime = player.duration / 100 * this.value;
-      })
-    }, false);*/
-    preloadInterpolationImages();
+    // Card pager: wraps each .card-rail with prev/next arrows and dots,
+    // paging one card at a time (native swipe still works without JS).
+    document.querySelectorAll('.card-rail').forEach(function (rail) {
+      var cards = rail.querySelectorAll('.info-card');
+      if (cards.length < 2) return;
 
-    $('#interpolation-slider').on('input', function(event) {
-      setInterpolationImage(this.value);
+      var wrap = document.createElement('div');
+      wrap.className = 'card-pager';
+      rail.parentNode.insertBefore(wrap, rail);
+      wrap.appendChild(rail);
+
+      var prev = document.createElement('button');
+      prev.type = 'button';
+      prev.className = 'pager-arrow pager-prev';
+      prev.setAttribute('aria-label', 'Previous card');
+      prev.innerHTML = '&#10094;';
+      var next = document.createElement('button');
+      next.type = 'button';
+      next.className = 'pager-arrow pager-next';
+      next.setAttribute('aria-label', 'Next card');
+      next.innerHTML = '&#10095;';
+      wrap.appendChild(prev);
+      wrap.appendChild(next);
+
+      var dots = document.createElement('div');
+      dots.className = 'pager-dots';
+      cards.forEach(function (_, i) {
+        var d = document.createElement('button');
+        d.type = 'button';
+        d.className = 'pager-dot';
+        d.setAttribute('aria-label', 'Go to card ' + (i + 1));
+        d.addEventListener('click', function () { go(i); });
+        dots.appendChild(d);
+      });
+      wrap.appendChild(dots);
+
+      function gap() {
+        return parseFloat(getComputedStyle(rail).columnGap) || 0;
+      }
+      function index() {
+        return Math.max(0, Math.min(cards.length - 1,
+          Math.round(rail.scrollLeft / (rail.clientWidth + gap()))));
+      }
+      function go(i) {
+        i = Math.max(0, Math.min(cards.length - 1, i));
+        rail.scrollTo({ left: i * (rail.clientWidth + gap()), behavior: 'smooth' });
+      }
+      function update() {
+        var i = index();
+        dots.querySelectorAll('.pager-dot').forEach(function (d, j) {
+          d.classList.toggle('is-active', j === i);
+        });
+        prev.disabled = i <= 0;
+        next.disabled = i >= cards.length - 1;
+      }
+
+      prev.addEventListener('click', function () { go(index() - 1); });
+      next.addEventListener('click', function () { go(index() + 1); });
+      rail.addEventListener('scroll', function () { requestAnimationFrame(update); }, { passive: true });
+      update();
     });
-    setInterpolationImage(0);
-    $('#interpolation-slider').prop('max', NUM_INTERP_FRAMES - 1);
 
     bulmaSlider.attach();
 
