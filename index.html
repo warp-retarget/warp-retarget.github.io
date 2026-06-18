@@ -228,9 +228,15 @@
           WARP's core, <b>c-SEW</b>, solves retargeting <b>in closed form</b> over the Shoulder&ndash;Elbow&ndash;Wrist representation: the palm is matched exactly as a hard constraint, the remaining freedom preserves the human pose, and joint angles follow analytically &mdash; <em>unique, exact, microseconds per frame, no calibration</em>.
         </p>
         <div class="has-text-centered">
-          <img src="./static/images_warp/warp_method_v2.png" alt="WARP method: adaptive offset, palm alignment, elbow nullspace resolution, solved SEW skeleton.">
+          <div class="video-block">
+            <video class="js-autoplay-inview" muted loop playsinline controls preload="metadata"
+                   poster="./static/videos/warp_method_animation_poster.jpg">
+              <source src="./static/videos/warp_method_animation.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
           <p class="fig-caption">
-            <b>(a)</b> Adaptive offset places the robot torso &rarr; <b>(b)</b> palm alignment fixes the wrist &rarr; <b>(c)</b> the elbow nullspace is identified &rarr; <b>(d)</b> the human elbow angle resolves it.
+            Animated walkthrough of <b>c-SEW</b>: from the SEW skeleton and end-effector mismatch, through the elbow nullspace, to the unique solved robot configuration. Plays automatically when in view.
           </p>
         </div>
         <div class="card-rail cols-4" style="margin-top: 1rem;">

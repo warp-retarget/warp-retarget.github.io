@@ -144,6 +144,25 @@ $(document).ready(function() {
       update();
     });
 
+    // Autoplay videos only while in view; pause when scrolled away.
+    // Opt in with class "js-autoplay-inview" (e.g. the method animation).
+    (function () {
+      var vids = document.querySelectorAll('video.js-autoplay-inview');
+      if (!vids.length) return;
+      function tryPlay(v) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      if (!('IntersectionObserver' in window)) {
+        vids.forEach(tryPlay);
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) tryPlay(e.target);
+          else e.target.pause();
+        });
+      }, { threshold: 0.35 });
+      vids.forEach(function (v) { io.observe(v); });
+    })();
+
     bulmaSlider.attach();
 
 })
